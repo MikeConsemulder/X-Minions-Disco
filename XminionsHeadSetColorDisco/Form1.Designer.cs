@@ -67,7 +67,7 @@
             // 
             this.checkServer.Enabled = true;
             this.checkServer.Interval = 5000;
-            //this.checkServer.Tick += new System.EventHandler(this.checkServer_Tick);
+            this.checkServer.Tick += new System.EventHandler(this.checkServer_Tick);
             // 
             // Form1
             // 

@@ -205,18 +205,17 @@ namespace XminionsHeadSetColorDisco
             string curFile = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "/SteelSeries/SteelSeries Engine 3/color.txt";
             if (!File.Exists(curFile))
             {
-                //Meh.. c# isn't letting me make a nice object to json string... meeehhhhh :(
                 string tempJson;
-                tempJson = "{\"low\":0,\"high\":0,\"color\":{\"red\":255,\"green\":0,\"blue\":0}}";
+                tempJson = "{\"low\":0,\"high\":0,\"color\":{\"red\":255,\"green\":255,\"blue\":0}}";
                 tempJson += ",{\"low\":1,\"high\":1,\"color\":{\"red\":0,\"green\":255,\"blue\":0}}";
                 tempJson += ",{\"low\":2,\"high\":2,\"color\":{\"red\":0,\"green\":0,\"blue\":255}}";
-                tempJson += ",{\"low\":3,\"high\":3,\"color\":{\"red\":255,\"green\":0,\"blue\":255}}";
-                tempJson += ",{\"low\":4,\"high\":4,\"color\":{\"red\":255,\"green\":255,\"blue\":0}}";
-                tempJson += ",{\"low\":5,\"high\":5,\"color\":{\"red\":255,\"green\":130,\"blue\":0}}";
-                tempJson += ",{\"low\":6,\"high\":6,\"color\":{\"red\":0,\"green\":255,\"blue\":255}}";
-                tempJson += ",{\"low\":7,\"high\":7,\"color\":{\"red\":130,\"green\":0,\"blue\":130}}";
-                tempJson += ",{\"low\":8,\"high\":8,\"color\":{\"red\":0,\"green\":255,\"blue\":130}}";
-                tempJson += ",{\"low\":9,\"high\":9,\"color\":{\"red\":255,\"green\":115,\"blue\":189}}";
+                tempJson += ",{\"low\":3,\"high\":3,\"color\":{\"red\":255,\"green\":20,\"blue\":147}}";
+                tempJson += ",{\"low\":4,\"high\":4,\"color\":{\"red\":0,\"green\":105,\"blue\":110}}";
+                tempJson += ",{\"low\":5,\"high\":5,\"color\":{\"red\":0,\"green\":255,\"blue\":255}}";
+                tempJson += ",{\"low\":6,\"high\":6,\"color\":{\"red\":255,\"green\":255,\"blue\":255}}";
+                tempJson += ",{\"low\":7,\"high\":7,\"color\":{\"red\":255,\"green\":255,\"blue\":0}}";
+                tempJson += ",{\"low\":8,\"high\":8,\"color\":{\"red\":100,\"green\":100,\"blue\":100}}";
+                tempJson += ",{\"low\":9,\"high\":9,\"color\":{\"red\":173,\"green\":255,\"blue\":47}}";
                 tempJson += ",{\"low\":10,\"high\":10,\"color\":{\"red\":255,\"green\":127,\"blue\":84}}";
                 string[] lines = { tempJson };
                 //send the default values to the file
@@ -280,6 +279,29 @@ namespace XminionsHeadSetColorDisco
             SubmitData(getIpFromJson, "50", "game_heartbeat");
         }
 
+        //Check the server for colorScheme
+        private void checkServerForJson()
+        {
+            var webRequest = WebRequest.Create(@"http://mico-media.nl/xminions/color.txt");
+            string strContent;
+            using (var response = webRequest.GetResponse())
+            using (var content = response.GetResponseStream())
+            using (var reader = new StreamReader(content))
+            {
+                strContent = reader.ReadToEnd();
+            }
+            if (compareColorStrings(readLocalColorJson(), strContent) == true)
+            {
+                //do nothing
+            }
+            else
+            {
+                //change the txt file
+                string[] lines = { strContent.Trim() };
+                writeColorToFile(lines);
+            }
+        }
+
         public string readLocalColorJson()
         {
             //read the color.txt from the programdata folder
@@ -289,6 +311,27 @@ namespace XminionsHeadSetColorDisco
             //return the json
             colorJson = line;
             return line;
+        }
+
+        private void checkServer_Tick(object sender, EventArgs e)
+        {
+            checkServerForJson();
+        }
+
+        private bool compareColorStrings(string localColor, string serverColor)
+        {
+            localColor = localColor.Trim();
+            serverColor = serverColor.Trim();
+            if (localColor.Equals(serverColor))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+
         }
     }
 }
